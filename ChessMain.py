@@ -26,17 +26,37 @@ Handle user input and updating the graphics
 """
 def main():
     p.init()
+    p.display.set_caption("stuckfish 1.0")
     screen = p.display.set_mode((WIDTH, HEIGHT))
     cloack = p.time.Clock()
     screen.fill(p.Color("black"))
     gs = ChessEngine.GameState()
     loadImages()
     running = True
+    sqSelected = ()
+    playerClicks = []
     
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
+            elif e.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()
+                y = location[0]//SQUARE_SIZE
+                x = location[1]//SQUARE_SIZE
+                if sqSelected == (x,y):
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (x,y)
+                    playerClicks.append(sqSelected)
+                if len(playerClicks) == 2:
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    print(move.getChessNotation())
+                    gs.makeMove(move)
+                    sqSelected = ()
+                    playerClicks = []
+
         drawGameState(screen, gs)
         cloack.tick(MAX_FPS)
         p.display.flip()
