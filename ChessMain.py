@@ -31,6 +31,8 @@ def main():
     cloack = p.time.Clock()
     screen.fill(p.Color("black"))
     gs = ChessEngine.GameState()
+    validMoves = gs.getValidMoves()
+    moveMade = False #flag variable for when a move is made
     loadImages()
     running = True
     sqSelected = ()
@@ -54,13 +56,20 @@ def main():
                 if len(playerClicks) == 2:
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     sqSelected = ()
                     playerClicks = []
             #key handler
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z:
                     gs.undoMove()
+                    moveMade = True
+        
+        if moveMade:
+            validMoves = gs.getValidMoves()
+            moveMade = False
 
         drawGameState(screen, gs)
         cloack.tick(MAX_FPS)
